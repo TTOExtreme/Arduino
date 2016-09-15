@@ -1,0 +1,19 @@
+###########################################
+# Datatypes (KEYWORD1)
+###########################################
+
+WifiConfig	KEYWORD1
+
+###########################################
+# Methods and Functions (KEYWORD2)
+###########################################
+Init				KEYWORD2
+Exec				KEYWORD2
+SetComSite			KEYWORD2
+useAltComSite		KEYWORD2
+GetCommandRecieved	KEYWORD2
+###########################################
+# Constants (LITERAL1)
+###########################################
+5546	LITERAL1
+80		LITERAL1

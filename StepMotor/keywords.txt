@@ -1,0 +1,19 @@
+###########################################
+# Datatypes (KEYWORD1)
+###########################################
+
+StepMotor	KEYWORD1
+
+###########################################
+# Methods and Functions (KEYWORD2)
+###########################################
+Step	KEYWORD2
+setStep	KEYWORD2
+setPorts	KEYWORD2
+setDirection	KEYWORD2
+setStrength	KEYWORD2
+setVelocity	KEYWORD2
+RevertDirection	KEYWORD2
+###########################################
+# Constants (LITERAL1)
+###########################################

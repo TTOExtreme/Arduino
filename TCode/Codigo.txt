@@ -1,0 +1,77 @@
+T00-retorna estado de connecçao
+T01-controle de dispositivo (on/off)
+T02-controle motor de passo (do n steps)
+T03-controle do servo (go to pos)
+T04-retorno de dados da porta
+T05-controle automatico de temperatura (stabilize in t temperature)
+T99-parada de emergencia (stop all)
+
+//set dispositivo
+P00-automatico
+P01-tempo ligado tp
+P02-tempo desligado tp
+P03-tempo de espera para ciclo tp
+P04-repetiçoes no ciclo rt
+P05-numero de ciclos ps
+
+//set motor de passo
+S00-numero de passos por comando (A/M)
+S01-velocidade do motor(M/A)
+S02-divisao de micropasso(M/A)
+S03-automatico com retorno(A)
+S05-automatico (A)
+S06-tempo de espera para ciclo (A)
+S07-repetiçoes no ciclo (A)
+S08-numero de ciclos (A)
+
+//controle cnc
+C00-numero de passos por milimetro (XYZ)/10
+C01-numero de passos por polegada (XYZ)
+C02-numero de passos para 360 graus (POL)
+C03-velocidade dos passos
+C04-divisao de passos
+C81-posicao para ir (absoluto)
+
+//aux
+CT-controle de temperatura
+
+//#TSR;
+//#T00;
+//#T01 Dv01 St01;
+//#T02 Dv01 RtH Ps200;
+//#T03 Dv00 Ps20;
+//#T04 Dv00;
+//#T04 Dv00 Tp500;  (Tp need to converts temp to 0-1023) Dv is the corespondent A port
+//#T99;
+//#P00 Dv00 St1; St1=automatico on St0=off
+//#P01 Dv00 Tp1000;-tempo ligado
+//#P02 Dv00 Tp1000;-tempo desligado
+//#P03 Dv00 Tp1000;-tempo de espera para ciclo
+//#P04 Dv00 Rt100;-repetiçoes no ciclo
+//#P05 Dv00 Ps100;-numero de ciclos
+
+//#S00 Dv00 Ps100; -numero de passos por comando (A)
+//#S01 Dv00 Tp100;- % velocidade do motor (M/A)
+//#S02 Dv00 Ms0;-divisao de micropasso (M/A) 0-4 >> 0-16 divisoes
+//#S03 Dv00 Rt1;-automatico com retorno (A)
+//#S05 Dv00 St1;-automatico (A)
+//#S06 Dv00 Tp1;-tempo de espera para ciclo (A)
+//#S07 Dv00 Rt10;-repetiçoes no ciclo (A)
+//#S08 Dv00 Ps50;-numero de ciclos (A)
+
+//#C00 Ps50;-numero de passos por decimo de milimetro
+//#C01 Ps50;-numero de passos por polegada (W.I.P.)
+//#C02 Ps50;-numero de passos para 360 graus
+//#C03 Tp50;-velocidade dos passos %0
+//#C04 Ps50;-divisao de passos
+//#C81 X10 Y20 Z20;-posicao para ir (absoluto)
+
+
+#S00 Dv00 Ps210;
+#S01 Dv00 Tp995;
+#S02 Dv00 Ms0;
+#S06 Dv00 Tp10;
+#S07 Dv00 Rt1;
+#S08 Dv00 Ps-1;
+#S03 Dv00 Rt1;
+#S05 Dv00 St1;
