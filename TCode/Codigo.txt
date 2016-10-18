@@ -59,8 +59,8 @@ CT-controle de temperatura
 //#S07 Dv00 Rt10;-repetiçoes no ciclo (A)
 //#S08 Dv00 Ps50;-numero de ciclos (A)
 
-//#C00 Ps50;-numero de passos por decimo de milimetro
-//#C01 Ps50;-numero de passos por polegada (W.I.P.)
+//#C00 Ps50;-numero de milimetros por volta
+//#C01 Ps50;-numero de pass	os por polegada (W.I.P.)
 //#C02 Ps50;-numero de passos para 360 graus
 //#C03 Tp50;-velocidade dos passos %0
 //#C04 Ps50;-divisao de passos
@@ -75,3 +75,10 @@ CT-controle de temperatura
 #S08 Dv00 Ps-1;
 #S03 Dv00 Rt1;
 #S05 Dv00 St1;
+
+
+//controle cnc
+//linear
+#C00 Ps
+
+

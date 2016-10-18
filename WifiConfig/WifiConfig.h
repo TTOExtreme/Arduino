@@ -14,17 +14,20 @@
 class WifiConfig {
 	public:
 		WifiConfig();
-		WifiConfig(int comPort);
+		
+		void SetComPort(int comPort);
 		
 		void Init();
 		void Exec();//executes the program(put this func in "void loop")
 		
 		void SetComSite(String htmlCode);
+		void SetIpEnd(int ipEnd);
 		void useAltComSite(bool useAlt);
 		String GetCommandRecieved();
 		//funçoes auxiliares
 		String GetComSite();
 		String GetSetupSite();
+		int _ipend=177;
 	private:
 	
 		void ExecCommands(String com);//get and executes commands  
@@ -40,12 +43,13 @@ class WifiConfig {
 		ESP8266WebServer cfgserver=ESP8266WebServer(80);//to config the dispositive
 		ESP8266WebServer comserver=ESP8266WebServer(5546);//to send commands
 		String ssidConfig = "ConfigNet";
+		int _ComPort=5546;
 		
 		String altComSiteCode="";
 		String LastCommand="";
 		bool altComSite=false;
 		bool isConfig=false;
-		bool debug = true;
+		bool debug = false;
 		//comunication
 		//***********************************************************
 		//String _password="123456";

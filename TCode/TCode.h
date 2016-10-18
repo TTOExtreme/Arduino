@@ -5,6 +5,7 @@
 #ifndef TCode_h
 #define TCode_h
 
+#include "WifiConfig.h"
 #include "Arduino.h"
 #include "SerialCom.h"
 //#include "StepMotor.h"
@@ -44,8 +45,8 @@ class TCode {
 		void S08();//-numero de ciclos
 		//set cnc
 		void C00();//-numero de passos por milimetro
-		void C01();//-numero de passos por polegada
-		void C02();//-numero de passos para 360 graus
+		void C01();//-numero de passos por polegada (WIP)
+		void C02();//-numero de passos para 360 graus ()
 		void C05();//-set origem na posicao atual
 		void C81();//-posicao para ir (sistema relativo e n absoluto)
 		
@@ -98,11 +99,17 @@ class TCode {
 		
 		//comunication
 		//***********************************************************
+		int _mode=0; //0 = bluetooth; 1 = wifi;
+		//Bluetooth/////////////////////////////////////////////////
 		//String _password="123456";
 		int _baudRate=9600;
 		char _first='#';//first char of receptor
 		char _last=';';//final char of receptor
 		SerialCom Com=SerialCom(_baudRate, _first, _last);
+		
+		//WiFi/////////////////////////////////////////////////////
+		WifiConfig wc = WifiConfig();
+		String _comHtml="";
 		//***********************************************************
 		
 		//stepmotors

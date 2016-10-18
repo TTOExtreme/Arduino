@@ -12,6 +12,7 @@ Exec				KEYWORD2
 SetComSite			KEYWORD2
 useAltComSite		KEYWORD2
 GetCommandRecieved	KEYWORD2
+SetIpEnd			KEYWORD2
 ###########################################
 # Constants (LITERAL1)
 ###########################################

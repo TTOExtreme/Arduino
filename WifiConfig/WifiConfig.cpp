@@ -5,20 +5,20 @@
 #include "Arduino.h"
 #include "WifiConfig.h"
 #include "SerialCom.h"
+#include "EEPROM.h"
+#include "ESP8266WebServer.h"
 //#include "StepMotor4988.h"
 
 WifiConfig::WifiConfig(){
-	if(debug){Com.Send("declarated");}
-	
 	cfgserver = ESP8266WebServer(80);//default port
 	comserver = ESP8266WebServer(5546);//port to transfer data
 }
 
-WifiConfig::WifiConfig(int comPort){
-	if(debug){Com.Send("declarated");}
+void WifiConfig::SetComPort(int comPort){
+	_ComPort=comPort;
 	
 	cfgserver = ESP8266WebServer(80);//default port
-	comserver = ESP8266WebServer(comPort);//port to transfer data
+	comserver = ESP8266WebServer(comPort);
 }
 
 void WifiConfig::Init(){
@@ -34,15 +34,15 @@ void WifiConfig::Init(){
 		isConfig=true;
 		ConnectTo(loadCfgSSID(),loadCfgPASS());
 		if(isConfig==true){
-			OpenComNetwork();
 		}
 	}
 	OpenConfigNetwork();
+	OpenComNetwork();
 }
 
 void WifiConfig::Exec(){ //function called in the loop
 	cfgserver.handleClient();
-	if(!isConfig){ return; }
+	//if(!isConfig){ return; }
 	comserver.handleClient();
 }
 
@@ -149,7 +149,7 @@ void WifiConfig::handleCfgRoot() {
     if(debug){Com.Send("Password: " + newPASS);}
     if(newSSID!="" && newPASS!=""){
 		isConfig=true;
-		if(!ConnectTo(newSSID,newPASS)){ if(debug){Com.Send("Failed!");} return;}
+		if(!ConnectTo(newSSID,newPASS)){ if(debug){Com.Send("Failed!");} EEPROM.write(0,char(2)); EEPROM.commit();}
 		writeCfg(newSSID,newPASS);
 		OpenComNetwork();
     }
@@ -168,9 +168,11 @@ void WifiConfig::handleComRoot(){
 //opens the sites
 void WifiConfig::OpenConfigNetwork(){
     if(isConfig==false){
-		//WiFi.mode(WIFI_AP);
 		//WiFi.disconnect();
+		//WiFi.mode(WIFI_AP);
+	
 		WiFi.softAP(ssidConfig.c_str());
+		
 		IPAddress myIP = WiFi.softAPIP();
 		if(debug){Com.Send("AP IP address: ");}
 		if(debug){Com.Send((myIP).toString());}
@@ -181,8 +183,6 @@ void WifiConfig::OpenConfigNetwork(){
 }
 void WifiConfig::OpenComNetwork(){
     IPAddress myIP = WiFi.localIP();
-    if(debug){Com.Send("IP address: ");}
-    if(debug){Com.Send((myIP).toString());}
     comserver.on("/data", std::bind(&WifiConfig::handleComRoot, this));
     comserver.begin();
     if(debug){Com.Send("HTTP server started");}
@@ -201,18 +201,40 @@ void WifiConfig::OpenComNetwork(){
 bool WifiConfig::ConnectTo(String newSSID,String newPASS){
 	WiFi.mode(WIFI_STA);
 	WiFi.disconnect();
-	IPAddress ip(192, 168, 0, 177);  
-	IPAddress gateway(192, 168, 0, 1);  
+	WiFi.begin(newSSID.c_str(),newPASS.c_str());
+	
+	int c=0;
+	while(WiFi.status()!=WL_CONNECTED){
+		c++;
+		if(c>30){ if(debug){Com.Send("Failed!");} isConfig=false; OpenConfigNetwork(); return false; }
+		delay(300);
+		//if(debug){Com.Send(".");}
+	}
+	
+	String ipget = WiFi.localIP().toString();
+	if(debug){Com.Send("Connecting to get data " + ipget);}
+	int ip1 = ipget.substring(0,ipget.indexOf(".")).toInt();
+	ipget = ipget.substring(ipget.indexOf(".")+1);
+	int ip2 = ipget.substring(0,ipget.indexOf(".")).toInt();
+	ipget = ipget.substring(ipget.indexOf(".")+1);
+	int ip3 = ipget.substring(0,ipget.indexOf(".")).toInt();
+	IPAddress ip(ip1, ip2, ip3, _ipend);  
+	IPAddress gateway(ip1, ip2, ip3, 1);  
 	IPAddress subnet(255, 255, 255, 0);  
+	
+	WiFi.mode(WIFI_STA);
+	WiFi.disconnect();
+	if(debug){Com.Send("Connecting to get data " + (String(_ipend)));}
+	
 	WiFi.config(ip, gateway, subnet);
 	WiFi.begin(newSSID.c_str(),newPASS.c_str());
-	int c=0;
+	c=0;
 	if(debug){Com.Send("Connecting");}
 	while(WiFi.status()!=WL_CONNECTED){
 		c++;
 		if(c>30){ if(debug){Com.Send("Failed!");} isConfig=false; OpenConfigNetwork(); return false; }
 		delay(300);
-		if(debug){Com.Send(".");}
+		//if(debug){Com.Send(".");}
 	}
 	if(debug){Com.Send("");}
 	if(debug){Com.Send("Connected");}
@@ -283,10 +305,16 @@ String WifiConfig::GetSetupSite(){//returns the html setup site
 
 //****************************************************************************************************************\\
 //User configs and gets
+void WifiConfig::SetIpEnd(int ipEnd){
+	_ipend=ipEnd;
+	if(debug){Com.Send("Set IpEnd: " + String(_ipend));}
+}
+
 void WifiConfig::SetComSite(String htmlCode){
 	altComSiteCode=htmlCode;
 	altComSite=true;
 }
+
 void WifiConfig::useAltComSite(bool useAlt){
 	altComSite=useAlt;
 }

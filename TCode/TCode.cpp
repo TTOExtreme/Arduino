@@ -6,16 +6,20 @@
 #include "TCode.h"
 #include "SerialCom.h"
 #include <Servo.h>
+#include "WifiConfig.h"
 //#include "StepMotor4988.h"
 
-TCode::TCode(){
+TCode::TCode(String mode){
+	if(mode=="Bluetooth"){_mode=0;}
+	if(mode=="WiFi"){_mode=1;}
 	if(debug){Com.Send("declarated");}
 }
 
 void TCode::Init(){
+	if(_mode==1){wc.Init();}
 	int lastPort=0;
 	int lastAPort=0;
-	if(debug){Com.Send("Init");}
+	//if(debug){Com.Send("Init");}
 	
 	if(_smNumber>0){
 		delete [] Asm;
@@ -116,56 +120,107 @@ void TCode::Init(){
 		
 		lastPort+=_dvServo;
 	}
-	if(debug){TSR();}
+	//if(debug){TSR();}
 }
 
 void TCode::TSR(){
 	if(_smNumber>0){
-		Com.Send("========================");
-		Com.Send("StepMotors ports:");
-		Com.Send("   step port: "+String(_smPins[0]));
-		Com.Send("   direction port: "+String(_smPins[1]));
-		Com.Send("   microstep 1 port: "+String(_smPins[2]));
-		Com.Send("   microstep 2 port: "+String(_smPins[3]));
-		Com.Send("   microstep 3 port: "+String(_smPins[4]));
-		Com.Send("   enable ports: "+String(_smNumber+6));
-		Com.Send("========================");
+		if(_mode=0){
+			Com.Send("========================");
+			Com.Send("StepMotors ports:");
+			Com.Send("   step port: "+String(_smPins[0]));
+			Com.Send("   direction port: "+String(_smPins[1]));
+			Com.Send("   microstep 1 port: "+String(_smPins[2]));
+			Com.Send("   microstep 2 port: "+String(_smPins[3]));
+			Com.Send("   microstep 3 port: "+String(_smPins[4]));
+			Com.Send("   enable ports: "+String(_smNumber+6));
+			Com.Send("========================");
+		}else{
+			_comHtml="";//reset the com site
+			
+			_comHtml += "<pre>========================</pre>";
+			_comHtml += "<pre>StepMotors ports:</pre>";
+			_comHtml += "<pre>   step port: "+String(_smPins[0])+"</pre>";
+			_comHtml += "<pre>   direction port: "+String(_smPins[1])+"</pre>";
+			_comHtml += "<pre>   microstep 1 port: "+String(_smPins[2])+"</pre>";
+			_comHtml += "<pre>   microstep 2 port: "+String(_smPins[3])+"</pre>";
+			_comHtml += "<pre>   microstep 3 port: "+String(_smPins[4])+"</pre>";
+			_comHtml += "<pre>   enable ports: "+String(_smNumber+6)+"</pre>";
+			_comHtml += "<pre>========================</pre>";
+		}
 	}
 	if(_dvNumber>0){
-		Com.Send("========================");
-		Com.Send("Devices ports:");
-		for(int i=0;i<_dvNumber;i++){
-			Com.Send("Device: "+String(i+1)+" Port: "+String(_dvPins[i]));
+		if(_mode==0){
+			Com.Send("========================");
+			Com.Send("Devices ports:");
+			for(int i=0;i<_dvNumber;i++){
+				Com.Send("Device: "+String(i+1)+" Port: "+String(_dvPins[i]));
+			}
+			Com.Send("========================");
+		}else{
+			_comHtml += "<pre>========================</pre>";
+			_comHtml += "<pre>Devices ports:</pre>";
+			for(int i=0;i<_dvNumber;i++){
+				_comHtml += "<pre>Device: "+String(i+1)+" Port: "+String(_dvPins[i])+"</pre>";
+			}
+			_comHtml += "========================";
 		}
-		Com.Send("========================");
 	}
 	if(_rtNumber>0){
-		Com.Send("========================");
-		Com.Send("Return ports:");
-		for(int i=0;i<_rtNumber;i++){
-			Com.Send("Device: "+String(i+1)+" Port: A"+String(_rtPins[i]));
+		if(_mode==0){
+			Com.Send("========================");
+			Com.Send("Return ports:");
+			for(int i=0;i<_rtNumber;i++){
+				Com.Send("Device: "+String(i+1)+" Port: A"+String(_rtPins[i]));
+			}
+			Com.Send("========================");
+		}else{
+			_comHtml += "<pre>========================</pre>";
+			_comHtml += "<pre>Return ports:</pre>";
+			for(int i=0;i<_rtNumber;i++){
+				_comHtml += "<pre>Device: "+String(i+1)+" Port: A"+String(_rtPins[i])+"</pre>";
+			}
+			_comHtml += "<pre>========================</pre>";
 		}
-		Com.Send("========================");
 	}
 	if(_tpNumber>0){
-		Com.Send("========================");
-		Com.Send("Temperature sensors:");
-		for(int i=0;i<_tpNumber;i++){
-			Com.Send("Sensor: "+String(i+1)+" Port: A"+String(_TpPins[i])+" Control (Output):"+String(_dvPins[i]));
+		if(_mode==0){
+			Com.Send("========================");
+			Com.Send("Temperature sensors:");
+			for(int i=0;i<_tpNumber;i++){
+				Com.Send("Sensor: "+String(i+1)+" Port: A"+String(_TpPins[i])+" Control (Output):"+String(_dvPins[i]));
+			}
+			Com.Send("========================");
+		}else{
+			_comHtml += "<pre>========================</pre>";
+			_comHtml += "<pre>Temperature sensors:</pre>";
+			for(int i=0;i<_tpNumber;i++){
+				_comHtml += "<pre>Sensor: "+String(i+1)+" Port: A"+String(_TpPins[i])+" Control (Output):"+String(_dvPins[i])+"</pre>";
+			}
+			_comHtml += "<pre>========================</pre>";
 		}
-		Com.Send("========================");
 	}
 	if(_dvServo>0){
-		Com.Send("========================");
-		Com.Send("Servo motors:");
-		for(int i=0;i<_dvServo;i++){
-			Com.Send("Device: "+String(i+1)+" Port: "+String(_SPins[i]));
+		if(_mode==0){
+			Com.Send("========================");
+			Com.Send("Servo motors:");
+			for(int i=0;i<_dvServo;i++){
+				Com.Send("Device: "+String(i+1)+" Port: "+String(_SPins[i]));
+			}
+			Com.Send("========================");
+		}else{
+			_comHtml += "<pre>========================</pre>";
+			_comHtml += "<pre>Servo motors:</pre>";
+			for(int i=0;i<_dvServo;i++){
+				_comHtml += "<pre>Device: "+String(i+1)+" Port: "+String(_SPins[i])+"</pre>";
+			}
+			_comHtml += "<pre>========================</pre>";
 		}
-		Com.Send("========================");
 	}
 }
 
 void TCode::Exec(){
+	if(_mode==1){wc.Exec();}
 	_string[0]="";
 	Decoder();
 	SMA();
@@ -173,121 +228,121 @@ void TCode::Exec(){
 	//_orgCode[20]="";
 	if(_string[0]=="TSR"){//#TSR;
 		TSR();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml+="<pre>n</pre>"}
 	}
 	if(_string[0]=="T00"){//#T00;
 		T00();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="T01"){//#T01 Dv01 St01;
 		T01();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="T02"){//#T02 Dv01 RtH Ps200;
 		T02();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="T03"){//#T03 Dv00 Ps20;
 		T03();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="T04"){//#T04 Dv00;
 		T04();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="T05"){//#T05 Dv00 Tp500;  (Tp need to converts temp to 0-1023) Dv is the corespondent Aport
 		T05();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="T99"){//#T99;
 		T99();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="P00"){//#P00 Dv00 St1; St1=automatico on St0=off
 		P00();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="P01"){//#P01 Dv00 Tp1000;-tempo ligado
 		P01();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="P02"){//#P02 Dv00 Tp1000;-tempo desligado
 		P02();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="P03"){//#P03 Dv00 Tp1000;-tempo de espera para ciclo
 		P03();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="P04"){//#P04 Dv00 Rt100;-repetiçoes no ciclo
 		P04();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="P05"){//#P05 Dv00 Ps100;-numero de ciclos
 		P05();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="S00"){//#S00 Dv00 Ps100; -numero de passos por comando (A)
 		S00();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="S01"){//#S01 Dv00 Tp100;- % velocidade do motor (M/A)
 		S01();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="S02"){//#S02 Dv00 Ms4;-divisao de micropasso (M/A) 0-4 >> 0-16 divisoes
 		S02();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="S03"){//#S03 Dv00 Rt1;-automatico com retorno (A)
 		S03();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="S05"){//#S05 Dv00 St0;-automatico (A)
 		S05();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="S06"){//#S06 Dv00 Tp1000;-tempo de espera para ciclo (A)
 		S06();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="S07"){//#S07 Dv00 Rt100;-repetiçoes no ciclo (A)
 		S07();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="S08"){//#S08 Dv00 Ps50;-numero de ciclos (A)
 		S08();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="C00"){//#C00 Ps50;-numero de passos por decimo de milimetro
 		C00();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="C01"){//#C01 Ps50;-numero de passos por polegada (W.I.P.)
 		C01();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="C02"){//#C02 Ps50;-numero de passos para 360 graus
 		C02();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="C03"){//#C03 Tp50;-velocidade dos passos %
 		C03();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="C04"){//#C04 Ps50;-divisao de passos
 		C04();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
 	if(_string[0]=="C81"||_string[0]=="G1"){//#C81 X10 Y20 Z20;-posicao para ir (absoluto)
 		C81();
-		Com.Send("N");
+		if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	}
-	
+	if(_mode==1){ wc.SetComSite(_comHtml); }
 }
 
 void TCode::T00(){//retorna estado de conexao 
-	Com.Send("y");
+	if(_mode==0){Com.Send("y");}else{_comHtml="<pre>y</pre>"}
 }
 
 void TCode::T01(){//controle de dispositivo 
@@ -297,7 +352,6 @@ void TCode::T01(){//controle de dispositivo
 	}else{
 		digitalWrite(_dvPins[_orgCode[0].toInt()],HIGH);
 	}
-	//Com.Send("N");//retorna dizendo que terminou o processo
 }
 
 void TCode::T02(){//controle motor de passo
@@ -307,7 +361,6 @@ void TCode::T02(){//controle motor de passo
 	//Asm[_orgCode[0].toInt()].setVelocity(_orgCode[5].toInt());
 	Asm[_orgCode[0].toInt()].setDirection(_orgCode[2].toInt());
 	Asm[_orgCode[0].toInt()].Step();
-	//Com.Send("N");//retorna dizendo que terminou o processo
 }
 
 void TCode::T03(){//controle do servo
@@ -317,14 +370,13 @@ void TCode::T03(){//controle do servo
 
 void TCode::T04(){//retorno de dados da porta
 	reOrg();
+	if(_mode==0){Com.Send("N");}else{_comHtml="<pre>n</pre>"}
 	Com.Send(String(analogRead(_rtPins[_orgCode[0].toInt()])));
-	//Com.Send("N");//retorna dizendo que terminou o processo
 }
 
 void TCode::T05(){
 	reOrg();
 	_TempAuto[_orgCode[0].toInt()]=_orgCode[5].toInt();
-	//Com.Send("N");//retorna dizendo que terminou o processo
 }
 
 void TCode::T99(){//parada de emergencia
@@ -334,7 +386,6 @@ void TCode::T99(){//parada de emergencia
 void TCode::P00(){
 	reOrg();
 	_dvAuto[_orgCode[0].toInt()]=_orgCode[1].toInt();
-	//Com.Send("N");//retorna dizendo que terminou o processo
 }
 
 void TCode::P01(){
@@ -365,50 +416,42 @@ void TCode::P05(){
 void TCode::S00(){
 	reOrg();
 	Asm[_orgCode[0].toInt()].setStep(_orgCode[4].toInt());
-	//Com.Send("N");//retorna dizendo que terminou o processo
 }
 
 void TCode::S01(){
 	reOrg();
 	Asm[_orgCode[0].toInt()].setVelocity(_orgCode[5].toInt());
-	//Com.Send("N");//retorna dizendo que terminou o processo
 }
 
 void TCode::S02(){
 	reOrg();
 	Asm[_orgCode[0].toInt()].setMicroStepDiv(_orgCode[3].toInt());
-	//Com.Send("N");//retorna dizendo que terminou o processo
 }
 
 void TCode::S03(){
 	reOrg();
 	_smARet[_orgCode[0].toInt()]=_orgCode[2].toInt();
-	//Com.Send("N");//retorna dizendo que terminou o processo
 }
 
 void TCode::S05(){
 	reOrg();
 	_smAuto[_orgCode[0].toInt()]=_orgCode[1].toInt();
 	_smATimerRef[_orgCode[0].toInt()]=micros();
-	//Com.Send("N");//retorna dizendo que terminou o processo
 }
 
 void TCode::S06(){
 	reOrg();
 	_smCTime[_orgCode[0].toInt()]=_orgCode[5].toInt();
-	//Com.Send("N");//retorna dizendo que terminou o processo
 }
 
 void TCode::S07(){
 	reOrg();
 	_smCRep[_orgCode[0].toInt()]=_orgCode[1].toInt();
-	//Com.Send("N");//retorna dizendo que terminou o processo
 }
 
 void TCode::S08(){
 	reOrg();
 	_smCNumber[_orgCode[0].toInt()]=_orgCode[4].toInt();
-	//Com.Send("N");//retorna dizendo que terminou o processo
 }
 
 void TCode::C00(){
@@ -431,15 +474,7 @@ void TCode::C02(){
 	reOrg();
 	_NPassRev=_orgCode[4].toInt();
 }
-/*
-void TCode::C03(){
-	//reOrg();
-	int veloc=(_orgCode[9].toInt()/60);//tempo entre cada passo em milisegundo =veloc*1000(s > ms)/1000(mm > milesimo de mm)
-	Asm[0].setVelocity(veloc);
-	Asm[1].setVelocity(veloc);
-	Asm[2].setVelocity(veloc);
-}
-//*/
+
 void TCode::C05(){
 	_LX=0;
 	_LY=0;
@@ -459,6 +494,65 @@ void TCode::C81(){
 	int ytx=1;//steps of y to do an x
 	
 	if(_CNCType==0){
+		
+		int passcount[3]{0,0,0};//x y z 
+		int passnum[3]{0,0,0};
+		
+		passnum[0]=sqrt(x1-_LX).toInt();
+		passnum[1]=sqrt(y1-_LY).toInt();
+		passnum[2]=sqrt(z1-_LZ).toInt();
+		
+		int minnum=passnum[0];
+		if(passnum[1]<minnum){ minnum=passnum[1]; }
+		if(passnum[2]<minnum){ minnum=passnum[2]; }
+		
+		passcount[0]=(passnum[0]/minnum).toInt();
+		passcount[1]=(passnum[1]/minnum).toInt();
+		passcount[2]=(passnum[2]/minnum).toInt();
+		
+		for(int i=minnum;i>0;i--){
+			for(int xnum=passcount[0];xnum>0;xnum-- ){
+				if(x1>_LX){
+					Asm[0].setDirection(1);
+					Asm[0].Step();
+					_LX -= 0.001;
+				}else{
+					if(x1<_LX){
+						Asm[0].setDirection(0);
+						Asm[0].Step();
+						_LX += 0.001;
+					}
+				}
+			}
+			for(int ynum=passcount[1];ynum>0;ynum-- ){
+				if(y1>_LY){
+					Asm[1].setDirection(1);
+					Asm[1].Step();
+					_LY -= 0.001;
+				}else{
+					if(y1<_LY){
+						Asm[1].setDirection(0);
+						Asm[1].Step();
+						_LY += 0.001;
+					}
+				}
+			}
+			for(int znum=passcount[2];znum>0;znum-- ){
+				if(z1>_LZ){
+					Asm[2].setDirection(1);
+					Asm[2].Step();
+					_LZ -= 0.001;
+				}else{
+					if(z1<_LZ){
+						Asm[2].setDirection(0);
+						Asm[2].Step();
+						_LZ += 0.001;
+					}
+				}
+			}
+		}
+		
+		
 		int sec=0;
 		while(1){
 			//security
@@ -531,7 +625,7 @@ void TCode::C81(){
 				}
 			}
 			if(x1==_LX && y1==_LY && z1==_LZ){break;}
-		}
+		}//*/
 	}else{
 		double nSQ=atan2(y1,x1);//angulo s+q
 		double nQ=acos(((x1*x1)+(y1*y1)+(_CNCSeg1*_CNCSeg1)-(_CNCSeg2*_CNCSeg2))/(2*_CNCSeg1*sqrt((x1*x1)+(y1*y1))));
@@ -641,7 +735,7 @@ void TCode::Decoder(){
 	int pos=0;
 	int fpos=0;
 	int i=0;
-	comando=Com.getString();
+	if(_mode==0){comando=Com.getString();}else{comando=wc.GetCommandRecieved()}
 	if(comando!="null"){
 		_string[19]=comando;
 		//if(debug){Com.Send("Recieve: "+_string[20]);}
@@ -720,7 +814,7 @@ void TCode::reOrg(){
 void TCode::C04(){
 	//reOrg();
 	if(_PassM >= 0.001){
-		double nv =_PassM/0.001;
+		double nv =_PassM;
 		if(nv > 24){//24=16+8
 			Com.Send("[Error] Precision below expected");
 		}else{
