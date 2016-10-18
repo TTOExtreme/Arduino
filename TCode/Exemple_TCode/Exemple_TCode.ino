@@ -1,6 +1,6 @@
 //#include <SerialCom.h>
 #include <TCode.h>
-TCode tc;
+TCode tc = new TCode("Bluetooth");//"Wifi"
 
 void setup() {
   Serial.begin(9600);
